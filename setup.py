@@ -6,5 +6,5 @@ setup(name='pypostbank',
       author='Tobias Bell',
       author_email='tobias.bell@gmail.com',
       url='http://code.google.com/p/pypostbank/',
-      py_modules=["pypostbank.py"]
+      packages=["pypostbank"]
 )
