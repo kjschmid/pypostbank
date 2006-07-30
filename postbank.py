@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2006 Tobias Bell <tobias.bell@web.de>
+# Copyright (C) 2006 Tobias Bell <tobias.bell@gmail.com>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ try:
 except:
     Decimal = float        
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 class PostBankError(Exception):
     """Basisklasse aller Exceptions dieses Moduls"""
