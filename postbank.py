@@ -206,8 +206,8 @@ class PostBankAccount(object):
             
             if not line:
                 continue
-            
-            if line.startswith("Postbank Kontoauszug"):
+
+            if line.startswith("Kontoums"):
                 self.name = line.split()[-1]
             elif line.startswith("Name:"):
                 self.holder = " ".join(line.split()[1:])
