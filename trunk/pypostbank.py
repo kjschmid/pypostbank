@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2006 Tobias Bell <tobias.bell@gmail.com>
+# Copyright (C) 2006-2007 Tobias Bell <tobias.bell@gmail.com>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -160,28 +160,8 @@ class PostBankAccount(object):
         * IBAN, International Bank Account Number, string
         * balance, Saldo, Decimal
         * outstandingMoney, vorgemerkte Umsätze, Decimal
-        * accountingRecords, einzelne Buchungssätze als Liste von
-          dictionaries mit den Attributen
-            + date, Datum, date
-            + valueDate, Wertstellung, date
-            + kind, Art, string
-            + information, Buchungshinweis, string
-            + initiator, Auftraggeber, string
-            + recipient, Empfänger, string
-            + amount, Betrag, Decimal
-            + balance, Saldo, Decimal
+        * accountingRecords, einzelne Buchungssätze
     """
-    
-    ACCOUNTING_COLUMNS = (
-        ("date",        parseDate),
-        ("valueDate",   parseDate),
-        ("kind",        str),
-        ("information", str),
-        ("initiator",   str),
-        ("recipient",   str),
-        ("amount",      parseAmount),
-        ("balance",     parseAmount)
-    )
 
     def __init__(self):
         self.name = ""
@@ -230,14 +210,54 @@ class PostBankAccount(object):
             
             if not line:
                 continue
-            
-            values = line.split("\t")
-            entry = {}
 
-            for (key, function), value in zip(self.ACCOUNTING_COLUMNS, values):
-                entry[key] = function(value)
-
+            entry = PostBankAccountRecord(line)
             self.accountingRecords.append(entry)
+
+class PostBankAccountRecord(object):
+    '''Bietet Zugriff auf einen Buchungssatz mit den Attributen
+        + date, Datum, date
+        + valueDate, Wertstellung, date
+        + kind, Art, string
+        + information, Buchungshinweis, string
+        + initiator, Auftraggeber, string
+        + recipient, Empfänger, string
+        + amount, Betrag, Decimal
+        + balance, Saldo, Decimal
+    '''
+
+    ACCOUNTING_COLUMNS = (
+        ("date",        parseDate),
+        ("valueDate",   parseDate),
+        ("kind",        str),
+        ("information", str),
+        ("initiator",   str),
+        ("recipient",   str),
+        ("amount",      parseAmount),
+        ("balance",     parseAmount)
+    )
+
+    def __init__(self, line=None):
+        self.date = None
+        self.valueDate = None
+        self.kind = ''
+        self.infomration = ''
+        self.inititor = ''
+        self.recipient = ''
+        self.amount = Decimal('0.00')
+        self.balance = Decimal('0.00')
+
+        if line:
+            self.parse(line)
+
+
+    def parse(self, line):
+        values = line.split("\t")
+
+        for (key, function), value in zip(self.ACCOUNTING_COLUMNS, values):
+                self.__dict__[key] = function(value)
+        
+        
 
 # Funktionen zum schnellen Zugriff auf Postbank Konten oder Kontendaten
 def getAccount(accountNumber, pinNumber):
@@ -254,7 +274,7 @@ def getAccount(accountNumber, pinNumber):
     'DE31200100209999999999'
     >>> a.holder
     'PETRA PFIFFIG'
-    >>> a.balance + a.outstandingMoney == a.accountingRecords[0]["balance"]
+    >>> a.balance + a.outstandingMoney == a.accountingRecords[0].balance
     True
     """
     pb = None
